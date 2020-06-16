@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <!-- <link rel="stylesheet" type="text/css" href="resource/css/message_style.css">   -->
+    <!-- <link rel="stylesheet" type="text/css" href="resource/css/video_style.css"> -->
+<!--     <link rel="stylesheet" type="text/css" href="resource/css/message_style.css">  
+    <link rel="stylesheet" type="text/css" href="resource/css/video_style.css"> -->
+    <link type="text/css" rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/cupertino/jquery-ui.min.css" />
+    <link rel="stylesheet" type="text/css" href="resource/css/format.css">
+    <link type="text/css" rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/cupertino/jquery-ui.min.css" />
+	</head>
+	<body>
+		<div id="container"> <!-- コンテナ -->
+		    <div id="main_video_container">
+		    	<div id="main_video_frame">
+              		<video id="video0" class="video-js vjs-default-skin vjs-big-play-centered chvid" data-setup="{}" >
+                		<source src="./resource/movie/setsunan/digestion/hq/stream/digestion_hq.m3u8" type="application/x-mpegURL">
+                	</video>
+		    	</div>
+		    	<input type="range" class="range" value="0.0" id="range" min="0.0" max="1980" step="1.0">
+		    	再生時間：<span id="value">0:00:00</span>
+		    	<button class="panel" id="start" type="button" name="name" value="value" onclick="video_controll('play',false)">再生</button>
+		    	<button class="panel" id="stop" type="button" name="name" value="value" onclick="video_controll('pause',false)">停止</button>
+		    	<button class="panel" id="createTag" type="button" name="name" value="value">問題</button>
+		    	<form id="tag_dialog" title="問題" style="display:none">
+                	<p>この時、救護所が取るべき最適な行動はどれか<br>
+                		<!-- <input type="text" id="tag_name" name="tag_name"><br> -->
+                	<!-- <p>内容:<br><input type="text" id="contents" name="contents"><br><br> -->
+                	<input type="radio" name="choice" value="actionA">行動A
+                	<input type="radio" name="choice" value="actionB">行動B
+                	<br>
+                	<input type="radio" name="choice" value="actionC">行動C
+                	<input type="radio" name="choice" value="actionD">行動D
+                	<br>
+                	<input type="reset" id="ok_button" value="OK"></p>
+                	<!-- <input type="reset" id="ok_button" value="OK" ></p> -->
+	            </form>
+		    </div>
+
+		    <div id="area_video_container">
+		    	<div class="video_container video_frame">
+              		<video id="video1" class="video-js vjs-default-skin vjs-big-play-centered chvid" data-setup="{}" onclick="play_movie(this.id)">
+               			<source src="./resource/movie/setsunan/digestion/hq/stream/digestion_hq.m3u8" type="application/x-mpegURL">
+               		</video>
+		   		</div>
+
+	    		<div class="video_container video_frame">
+             		<video id="video2" class="video-js vjs-default-skin vjs-big-play-centered chvid" data-setup="{}" onclick="play_movie(this.id)">
+                		<source src="./resource/movie/setsunan/digestion/shelter/stream/digestion_shelter.m3u8" type="application/x-mpegURL">
+                	</video>
+		    	</div>
+
+<!-- 		    	<div class="video_container video_frame">
+              		<video id="video3" class="video-js vjs-default-skin vjs-big-play-centered chvid" data-setup="{}" onclick="play_movie(this.id)">
+                		<source src="./resource/movie/setsunan/digestion/shelter/stream/digestion_shelter.m3u8" type="application/x-mpegURL">
+                	</video>
+		   		</div> -->
+
+		    </div> <!-- アイテム -->
+		    <div id="talk_container"> <!-- アイテム -->
+		    	<div class="infobox_container">
+		    		本部
+		    		<div class="infobox" id="hq_talk">
+        			</div>
+        		</div>
+
+		    	<div class="infobox_container">
+		    		救護所
+		    		<div class="infobox" id="fa_talk">
+        			</div>
+		    	</div>
+		    	<div class="infobox_container">
+		    		避難所
+		    		<div class="infobox" id="shelter_talk">
+        			</div>
+		    	</div>
+		    </div>
+		</div>
+	    <link href="./resource/js/video-js-7.7.5/video-js.min.css" rel="stylesheet">
+	    <script src="./resource/js/video-js-7.7.5/video.js"></script>
+	    <script src="./resource/js/videojs-contrib-hls.min.js"></script>
+	    <script src="./resource/js/videojs-contrib-media-sources.js"></script>
+	    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	    <script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+	    <script type="text/javascript" src="http://code.jquery.com/ui/1.10.3/jquery-ui.min.js"></script>
+	    <script src="resource/js/jQuery-tinyDraggable-master/jquery.tiny-draggable.js"></script>
+	    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/0.8.9/jquery.csv.min.js"></script>
+	    <script src="resource/js/digestion.js" type="text/javascript"></script>
+	    <!-- <script src="resource/js/shiga.js" type="text/javascript"></script> -->
+	 </body>
+</html>

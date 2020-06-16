@@ -1,0 +1,87 @@
+html {
+	height: 100%;
+}
+
+body {
+	height: 100%;
+	margin: 0;
+}
+
+span:hover {
+	cursor : pointer;
+	font-weight :100;
+	color:#cc00cc;
+}
+
+/* コンテナ */
+#container {
+	width: 100%;
+	height: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+}
+
+/* アイテム */
+#main_video_container {
+	display: grid;
+	grid-column: 1 / 3;
+    grid-row: 1 / 3;
+    background: #f88;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+}
+#area_video_container {
+	display: grid;
+	grid-column: 3 / 4;
+    grid-row: 1 / 3;
+    background: #8f8;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr  ;
+}
+#talk_container {
+	/*position: relative;*/
+	display: grid;
+	grid-column: 1 / 4;
+    grid-row: 3 / 4;
+    background: #88f;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr;
+}
+ 
+.video_container {
+	position: relative;
+	background: red;
+	margin: 10px 90px;
+/*	height: 100%;
+	width: 100%;*/
+}
+
+#main_video_frame {
+	/*background: blue;*/
+	margin: 10px;
+}
+
+.chvid {
+	/*position: absolute;*/
+	/*border: 1px solid black;*/
+	height: 100%;
+	width: 100%;
+}
+
+.infobox_container {
+	position: relative;
+	margin: 10px;
+	border: 1px solid black;
+}
+
+.infobox {
+	position: absolute;
+	width: 100%;
+	height: 90%;
+	border: 1px solid black;
+    overflow: scroll;
+    background-color: #fff0f0;
+   	overflow: auto;
+}
+

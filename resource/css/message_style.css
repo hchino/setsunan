@@ -1,0 +1,53 @@
+span:hover {
+	cursor : pointer;
+	font-weight :100;
+	color:#cc00cc;
+}
+
+
+
+.cursor {
+	cursor : pointer;
+}
+
+#video0_position{
+	position: relative;
+	top: -15px;
+	left: 10px;
+	pointer-events: none;
+}
+
+#video1_position{
+	position: relative;
+	top: -15px;
+	left: 10px;
+	pointer-events: none;
+}
+
+#video2_position{
+	position: relative;
+	top: -15px;
+	left: 10px;
+	pointer-events: none;
+}
+
+#video3_position{
+	position: relative;
+	top: -15px;
+	left: 10px;
+	pointer-events: none;
+}
+
+#video4_position{
+	position: relative;
+	top: -15px;
+	left: 10px;
+	pointer-events: none;
+}
+
+#video5_position{
+	position: relative;
+	top: -15px;
+	left: 10px;
+	pointer-events: none;
+}
