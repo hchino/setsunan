@@ -3,6 +3,7 @@ var message_timer_hq=[];
 var video = [];
 var log_file_fa = "resource/log_data/軽度喘息対応_救護所.csv";
 var log_file_hq = "resource/log_data/軽度喘息対応_本部.csv";
+var question_flag = true;
 $(function() {
 
 	$.ajax({
@@ -22,11 +23,11 @@ $(function() {
 						insert_contents += "</span><div>--------------------------------------------</div></div>";
 					}
 					if (csvList[i][1] != "" && csvList[i][2] != "")	{
-						insert_contents += '<div id="message_fa_' + csvList[i][0] + '" onclick="' + 'video_controll(' + "'" + "log_change" +"'" + ',this.id)"><span>' + hms + "<br>" + csvList[i][1] + '「' + csvList[i][2] + "」";
+						insert_contents += '<div class="message_fa_' + csvList[i][0] + '" onclick="' + 'video_controll(' + "'" + "log_change" +"'" + ',this.id)"><span>' + hms + "<br>" + csvList[i][1] + '「' + csvList[i][2] + "」";
 					} else if (csvList[i][2] != "") {
-						insert_contents += '<div id="message_fa_' + csvList[i][0] + '" onclick="' + 'video_controll(' + "'" + "log_change" +"'" + ',this.id)"><span>' + hms + "<br> ？「" + csvList[i][2] + "」";
+						insert_contents += '<div class="message_fa_' + csvList[i][0] + '" onclick="' + 'video_controll(' + "'" + "log_change" +"'" + ',this.id)"><span>' + hms + "<br> ？「" + csvList[i][2] + "」";
 					} else {
-						insert_contents += '<div id="message_fa_' + csvList[i][0] + '" onclick="' + 'video_controll(' + "'" + "log_change" +"'" + ',this.id)"><span>' + hms + "〜 " + csvList[i][1] + " 〜";
+						insert_contents += '<div class="message_fa_' + csvList[i][0] + '" onclick="' + 'video_controll(' + "'" + "log_change" +"'" + ',this.id)"><span>' + hms + "〜 " + csvList[i][1] + " 〜";
 					}
 					message_timer_fa.push(csvList[i][0]);
 				} else {
@@ -40,6 +41,7 @@ $(function() {
 				}
 			}
 			$('#fa_talk').append(insert_contents);
+			$('#fa_talk_switch').append(insert_contents);
 		}
 	});
 
@@ -60,11 +62,11 @@ $(function() {
 						insert_contents += "</span><div>--------------------------------------------</div></div>";
 					}
 					if (csvList[i][1] != "" && csvList[i][2] != "")	{
-						insert_contents += '<div id="message_hq_' + csvList[i][0] + '" onclick="' + 'video_controll(' + "'" + "log_change" +"'" + ',this.id)"><span>' + hms + "<br>" + csvList[i][1] + '「' + csvList[i][2] + "」";
+						insert_contents += '<div class="message_hq_' + csvList[i][0] + '" onclick="' + 'video_controll(' + "'" + "log_change" +"'" + ',this.id)"><span>' + hms + "<br>" + csvList[i][1] + '「' + csvList[i][2] + "」";
 					} else if (csvList[i][2] != "") {
-						insert_contents += '<div id="message_hq_' + csvList[i][0] + '" onclick="' + 'video_controll(' + "'" + "log_change" +"'" + ',this.id)"><span>' + hms + "<br> ？「" + csvList[i][2] + "」";
+						insert_contents += '<div class="message_hq_' + csvList[i][0] + '" onclick="' + 'video_controll(' + "'" + "log_change" +"'" + ',this.id)"><span>' + hms + "<br> ？「" + csvList[i][2] + "」";
 					} else {
-						insert_contents += '<div id="message_hq_' + csvList[i][0] + '" onclick="' + 'video_controll(' + "'" + "log_change" +"'" + ',this.id)"><span>' + hms + "〜 " + csvList[i][1] + " 〜";
+						insert_contents += '<div class="message_hq_' + csvList[i][0] + '" onclick="' + 'video_controll(' + "'" + "log_change" +"'" + ',this.id)"><span>' + hms + "〜 " + csvList[i][1] + " 〜";
 					}
 					message_timer_hq.push(csvList[i][0]);
 				} else {
@@ -78,11 +80,12 @@ $(function() {
 				}
 			}
 			$('#hq_talk').append(insert_contents);
+			$('#hq_talk_switch').append(insert_contents);
 		}
 	});
 
 //videoの数
-	for (var i = 0; i < 3; i++){
+	for (var i = 0; i < 4; i++){
 		var video_id = "video" + i;
 		video[i] = videojs(video_id);
 		if (i != 0) {
@@ -100,6 +103,45 @@ $(function() {
 		var dialog = document.getElementById('tag_dialog');
 		$("#tag_dialog").dialog();
 	});
+});
+
+function switch_video(status){	
+	var video_a = document.getElementById('main_video_frame');
+	var video_b = document.getElementById('main_video_frame_2');
+	if (status = "block") {
+		video_a.style.display = "none";
+		video_b.style.display = "block";	
+	} else {
+		video_a.style.display = "block";
+		video_b.style.display = "none";
+	}
+}
+
+function create_question(){
+	video_controll('pause',false);
+	var dialog = document.getElementById('tag_dialog');
+	$("#tag_dialog").dialog();
+}
+
+$("#ok_button").on("click", function() {
+	$("#tag_dialog").dialog("close");
+	video_controll('play',false);
+});
+
+$("#start").on("click", function() {
+	var a = document.getElementById('main_video_frame');
+	var b = document.getElementById('main_video_frame_2');
+	a.style.display = "none";
+	b.style.display = "block";
+	// console.log(a.style.display);
+	// console.log(b.style.display);
+});
+
+$("#stop").on("click", function() {
+	var a = document.getElementById('main_video_frame');
+	var b = document.getElementById('main_video_frame_2');
+	a.style.display = "block";
+	b.style.display = "none";
 });
 
 function timer_count(now_time) {
@@ -165,21 +207,32 @@ var switch_messageColor = function(){
 	var now = video[0].currentTime();
 	for (var i = 0;i<message_timer_fa.length; i++){
     	var href = "message_fa_" + message_timer_fa[i];
+    	var element = document.getElementsByClassName(href);
+
     	if (message_timer_fa[i] < now && message_timer_fa[i+1] > now){
-      		document.getElementById(href).style.backgroundColor = '#CCCCCC';
+    		for (j=0; j<element.length; j++){
+    			element[j].style.backgroundColor = '#CCCCCC';
+    		}
     	}
     	else {
-      		document.getElementById(href).style.backgroundColor = '#fff0f0';
+    		for (j=0; j<element.length; j++){
+    			element[j].style.backgroundColor = '#fff0f0';
+			}
     	}
   	}
 
 	for (var i = 0;i<message_timer_hq.length; i++){
     	var href = "message_hq_" + message_timer_hq[i];
+    	var element = document.getElementsByClassName(href);
     	if (message_timer_hq[i] < now && message_timer_hq[i+1] > now){
-      		document.getElementById(href).style.backgroundColor = '#CCCCCC';
+    		for (j=0; j<element.length; j++){
+    			element[j].style.backgroundColor = '#CCCCCC';
+    		}
     	}
     	else {
-      		document.getElementById(href).style.backgroundColor = '#fff0f0';
+    		for (j=0; j<element.length; j++){
+    			element[j].style.backgroundColor = '#fff0f0';
+			}
     	}
   	}
 }
@@ -193,7 +246,15 @@ function scroll() {
 	document.getElementById("value").innerText = hms;
 	document.getElementById("range").value = timer;
 
-	while (!(document.getElementById(message_id_hq))) {
+	// if (timer == 5) {
+	// 	switch_video((document.getElementById('main_video_frame')).style.display);
+	// }
+	// if (timer == 10 && question_flag) {
+	// 	create_question();
+	// 	question_flag = false;
+	// }
+
+	while (!(document.getElementsByClassName(message_id_hq))) {
 		timer = timer - 1;
 		message_id_hq = "message_hq_" + timer;
 		if (timer < 1) {
@@ -201,7 +262,7 @@ function scroll() {
 		}
 	}
 	timer = parseInt((video[0]).currentTime());
-	while (!(document.getElementById(message_id_fa))) {
+	while (!(document.getElementsByClassName(message_id_fa))) {
 		timer = timer - 1;
 		message_id_fa = "message_fa_" + timer;
 		if (timer < 1) {
@@ -211,8 +272,8 @@ function scroll() {
 
 	if (timer > 1) {
 		//console.log(timer);
-		$('#fa_talk').animate({scrollTop:$("#" + message_id_fa).position().top + $('#fa_talk').scrollTop()}, speed, 'swing');
-		$('#hq_talk').animate({scrollTop:$("#" + message_id_hq).position().top + $('#hq_talk').scrollTop()}, speed, 'swing');
+		$('#fa_talk').animate({scrollTop:$("#fa_talk>." + message_id_fa).position().top + $('#fa_talk').scrollTop()}, speed, 'swing');
+		$('#hq_talk').animate({scrollTop:$("#hq_talk>." + message_id_hq).position().top + $('#hq_talk').scrollTop()}, speed, 'swing');
 
 	} else {
 		return false;

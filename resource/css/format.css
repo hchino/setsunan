@@ -57,7 +57,7 @@ span:hover {
 	width: 100%;*/
 }
 
-#main_video_frame {
+.main_video_frame {
 	/*background: blue;*/
 	margin: 10px;
 }
@@ -83,5 +83,15 @@ span:hover {
     overflow: scroll;
     background-color: #fff0f0;
    	overflow: auto;
+}
+
+.infobox_switch{
+	position: absolute;
+	/*position: relative;*/
+	width: 99%;
+	height: 75%;
+	border: 1px solid black;
+    overflow: scroll;
+    background-color: #fff0f0;
 }
 

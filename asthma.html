@@ -1,28 +1,51 @@
 <!DOCTYPE html>
-<html xmlns="https://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <!-- <link rel="stylesheet" type="text/css" href="resource/css/message_style.css">   -->
     <!-- <link rel="stylesheet" type="text/css" href="resource/css/video_style.css"> -->
 <!--     <link rel="stylesheet" type="text/css" href="resource/css/message_style.css">  
     <link rel="stylesheet" type="text/css" href="resource/css/video_style.css"> -->
-    <link type="text/css" rel="stylesheet" href="https://code.jquery.com/ui/1.10.3/themes/cupertino/jquery-ui.min.css" />
+    <link type="text/css" rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/cupertino/jquery-ui.min.css" />
     <link rel="stylesheet" type="text/css" href="resource/css/format.css">
-    <link type="text/css" rel="stylesheet" href="https://code.jquery.com/ui/1.10.3/themes/cupertino/jquery-ui.min.css" />
+    <link type="text/css" rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/cupertino/jquery-ui.min.css" />
 	</head>
 	<body>
 		<div id="container"> <!-- コンテナ -->
 		    <div id="main_video_container">
-		    	<div id="main_video_frame">
+		    	<div class="main_video_frame" id="main_video_frame" style="display: block;">
               		<video id="video0" class="video-js vjs-default-skin vjs-big-play-centered chvid" data-setup="{}" >
-                		<source src="./resource/movie/setsunan/digestion/hq/stream/digestion_hq.m3u8" type="application/x-mpegURL">
+                		<source src="./resource/movie/setsunan/zensoku/hq/stream/zensoku_hq.m3u8" type="application/x-mpegURL">
                 	</video>
 		    	</div>
-		    	<input type="range" class="range" value="0.0" id="range" min="0.0" max="1980" step="1.0">
-		    	再生時間：<span id="value">0:00:00</span>
-		    	<button class="panel" id="start" type="button" name="name" value="value" onclick="video_controll('play',false)">再生</button>
-		    	<button class="panel" id="stop" type="button" name="name" value="value" onclick="video_controll('pause',false)">停止</button>
-		    	<button class="panel" id="createTag" type="button" name="name" value="value">問題</button>
+		    	<div class="main_video_frame" id="main_video_frame_2" style="display: none;">
+              		<video id="video3" class="video-js vjs-default-skin vjs-big-play-centered chvid" data-setup="{}" >
+                		<source src="./resource/movie/setsunan/zensoku/fa/stream/zensoku_fa.m3u8" type="application/x-mpegURL">
+                	</video>
+		    	</div>
+		    	<div style="position: relative;">
+		    		<input type="range" class="range" value="0.0" id="range" min="0.0" max="460" step="1.0" style="display: none;">
+		    		再生時間：<span id="value" >0:00:00</span>
+			    	<button class="panel" id="foo" type="button" name="name" value="value" onclick="video_controll('play',false)">再生</button>
+			    	<button class="panel" id="start" type="button" name="name" value="value">1</button>
+			    	<button class="panel" id="stop" type="button" name="name" value="value">2</button>
+			    	<button class="panel" id="createTag" type="button" name="name" value="value">問題</button><br>
+			    	<div class="infobox_switch" id="hq_talk_switch" style="display: none;">
+        			</div>
+        			<div class="infobox_switch" id="fa_talk_switch" style="display: block;">
+        			</div>
+        			<br><br><br><br>
+        		</div>
+<!-- 		    	<div style="position: relative;">
+		    		<input type="range" class="range" value="0.0" id="range" min="0.0" max="460" step="1.0" style="display: none;">
+		    		再生時間：<span id="value" style="position: absolute;">0:00:00</span>
+			    	<button class="panel" id="foo" type="button" name="name" value="value" onclick="video_controll('play',false)">再生</button>
+			    	<button class="panel" id="start" type="button" name="name" value="value">1</button>
+			    	<button class="panel" id="stop" type="button" name="name" value="value">2</button>
+			    	<button class="panel" id="createTag" type="button" name="name" value="value">問題</button><br>
+		    		<span class="infobox_switch" id="hq_talk">
+        			</span>
+		    	</div> -->
 		    	<form id="tag_dialog" title="問題" style="display:none">
                 	<p>この時、救護所が取るべき最適な行動はどれか<br>
                 		<!-- <input type="text" id="tag_name" name="tag_name"><br> -->
@@ -41,19 +64,19 @@
 		    <div id="area_video_container">
 		    	<div class="video_container video_frame">
               		<video id="video1" class="video-js vjs-default-skin vjs-big-play-centered chvid" data-setup="{}" onclick="play_movie(this.id)">
-               			<source src="./resource/movie/setsunan/digestion/hq/stream/digestion_hq.m3u8" type="application/x-mpegURL">
+               			<source src="./resource/movie/setsunan/zensoku/hq/stream/zensoku_hq.m3u8" type="application/x-mpegURL">
                		</video>
 		   		</div>
 
 	    		<div class="video_container video_frame">
              		<video id="video2" class="video-js vjs-default-skin vjs-big-play-centered chvid" data-setup="{}" onclick="play_movie(this.id)">
-                		<source src="./resource/movie/setsunan/digestion/shelter/stream/digestion_shelter.m3u8" type="application/x-mpegURL">
+                		<source src="./resource/movie/setsunan/zensoku/fa/stream/zensoku_fa.m3u8" type="application/x-mpegURL">
                 	</video>
 		    	</div>
 
 <!-- 		    	<div class="video_container video_frame">
               		<video id="video3" class="video-js vjs-default-skin vjs-big-play-centered chvid" data-setup="{}" onclick="play_movie(this.id)">
-                		<source src="./resource/movie/setsunan/digestion/shelter/stream/digestion_shelter.m3u8" type="application/x-mpegURL">
+                		<source src="./resource/movie/setsunan/zensoku/hq/stream/zensoku_hq.m3u8" type="application/x-mpegURL">
                 	</video>
 		   		</div> -->
 
@@ -81,12 +104,12 @@
 	    <script src="./resource/js/video-js-7.7.5/video.js"></script>
 	    <script src="./resource/js/videojs-contrib-hls.min.js"></script>
 	    <script src="./resource/js/videojs-contrib-media-sources.js"></script>
-	    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-	    <script type="text/javascript" src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
-	    <script type="text/javascript" src="https://code.jquery.com/ui/1.10.3/jquery-ui.min.js"></script>
+	    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	    <script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+	    <script type="text/javascript" src="http://code.jquery.com/ui/1.10.3/jquery-ui.min.js"></script>
 	    <script src="resource/js/jQuery-tinyDraggable-master/jquery.tiny-draggable.js"></script>
 	    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/0.8.9/jquery.csv.min.js"></script>
-	    <script src="resource/js/digestion.js" type="text/javascript"></script>
+	    <script src="resource/js/zensoku.js" type="text/javascript"></script>
 	    <!-- <script src="resource/js/shiga.js" type="text/javascript"></script> -->
 	 </body>
 </html>
