@@ -13,64 +13,108 @@
 	<body>
 		<div id="container"> <!-- コンテナ -->
 		    <div id="main_video_container">
-		    	<div class="main_video_frame" id="main_video_frame" style="display: block;">
+		    	<div class="main_video_frame" id="main_video_frame" style="display: none;">
               		<video id="video0" class="video-js vjs-default-skin vjs-big-play-centered chvid" data-setup="{}" >
-                		<source src="./resource/movie/setsunan/zensoku/hq/stream/zensoku_hq.m3u8" type="application/x-mpegURL">
+                		<source src="./resource/movie/setsunan/zensoku/hq/stream/zensoku_hq_low.m3u8" type="application/x-mpegURL">
                 	</video>
 		    	</div>
-		    	<div class="main_video_frame" id="main_video_frame_2" style="display: none;">
+
+		    	<div class="main_video_frame" id="main_video_frame_2" style="display: block;">
               		<video id="video3" class="video-js vjs-default-skin vjs-big-play-centered chvid" data-setup="{}" >
-                		<source src="./resource/movie/setsunan/zensoku/fa/stream/zensoku_fa.m3u8" type="application/x-mpegURL">
+                		<source src="./resource/movie/setsunan/zensoku/fa/stream/zensoku_fa_low.m3u8" type="application/x-mpegURL">
                 	</video>
 		    	</div>
+
+                <div class="main_video_frame" id="main_video_frame_3" style="display: none;">
+                    <video id="video4" class="video-js vjs-default-skin vjs-big-play-centered chvid" data-setup="{}" >
+                        <source src="./resource/movie/setsunan/zensoku/hq/stream2/zensoku_hq.m3u8" type="application/x-mpegURL">
+                    </video>
+                </div>
+
+                <div class="main_video_frame" id="main_video_frame_4" style="display: none;">
+                    <video id="video5" class="video-js vjs-default-skin vjs-big-play-centered chvid" data-setup="{}" >
+                        <source src="./resource/movie/setsunan/zensoku/fa/stream2/zensoku_fa.m3u8" type="application/x-mpegURL">
+                    </video>
+                </div>
+
+
+
 		    	<div style="position: relative;">
-		    		<input type="range" class="range" value="0.0" id="range" min="0.0" max="460" step="1.0" style="display: none;">
+		    		<input type="range" class="range" value="0.0" id="range" min="0.0" max="460" step="1.0" style="display: block; width: 500px;">
 		    		再生時間：<span id="value" >0:00:00</span>
-			    	<button class="panel" id="foo" type="button" name="name" value="value" onclick="video_controll('play',false)">再生</button>
-			    	<button class="panel" id="start" type="button" name="name" value="value">1</button>
-			    	<button class="panel" id="stop" type="button" name="name" value="value">2</button>
-			    	<button class="panel" id="createTag" type="button" name="name" value="value">問題</button><br>
-			    	<div class="infobox_switch" id="hq_talk_switch" style="display: none;">
+			    	<button class="panel" id="start" type="button" name="name" value="value" onclick="video_controll('play',false)">再生</button>
+                    <button class="panel" id="stop" type="button" name="name" value="value" onclick="video_controll('pause',false)">停止</button>
+                    <button class="panel" id="change_word" type="button" name="name" value="value">字幕切り替え</button>
+                    <button class="panel" id="change_movie" type="button" name="name" value="value">動画切り替え</button>
+			    	<button class="panel" id="question_1" type="button" name="name" value="value">問題1</button>
+			    	<button class="panel" id="question_2" type="button" name="name" value="value">問題2</button>
+                    <button class="panel" id="question_3" type="button" name="name" value="value">問題3</button>
+<!-- 			    	<button class="panel" id="createTag" type="button" name="name" value="value">問題</button><br> -->
+<!-- 			    	<div class="infobox_switch" id="hq_talk_switch" style="display: none;">
         			</div>
         			<div class="infobox_switch" id="fa_talk_switch" style="display: block;">
-        			</div>
-        			<br><br><br><br>
+        			</div> -->
+        			<!-- <br><br><br><br> -->
         		</div>
-<!-- 		    	<div style="position: relative;">
-		    		<input type="range" class="range" value="0.0" id="range" min="0.0" max="460" step="1.0" style="display: none;">
-		    		再生時間：<span id="value" style="position: absolute;">0:00:00</span>
-			    	<button class="panel" id="foo" type="button" name="name" value="value" onclick="video_controll('play',false)">再生</button>
-			    	<button class="panel" id="start" type="button" name="name" value="value">1</button>
-			    	<button class="panel" id="stop" type="button" name="name" value="value">2</button>
-			    	<button class="panel" id="createTag" type="button" name="name" value="value">問題</button><br>
-		    		<span class="infobox_switch" id="hq_talk">
-        			</span>
-		    	</div> -->
-		    	<form id="tag_dialog" title="問題" style="display:none">
-                	<p>この時、救護所が取るべき最適な行動はどれか<br>
+		    	<form id="tag_dialog_1" title="問題" style="display:none;">
+                	<p>なぜ咳のある喘息患者にここまで（救急車の検討　他）対応する必要があるか<br>
                 		<!-- <input type="text" id="tag_name" name="tag_name"><br> -->
                 	<!-- <p>内容:<br><input type="text" id="contents" name="contents"><br><br> -->
-                	<input type="radio" name="choice" value="actionA">行動A
+                	<input type="radio" name="choice" value="actionA">感染症の疑いを捨てきれないから
+                	<br>
+                	<input type="radio" name="choice" value="actionB">喘息は急性に悪化し死ぬ場合があるから
+                	<br>
+                	<input type="radio" name="choice" value="actionC">子どもなので大事をとる必要があるから
+                	<br>
+                	<input type="radio" name="choice" value="actionD">本部に医者がおらず診断できないから
+                	<br>
+                	<input type="reset" id="ok_button_1" value="OK"></p>
+                	<!-- <input type="reset" id="ok_button" value="OK" ></p> -->
+	            </form>
+		    	<form id="tag_dialog_2" title="問題" style="display:none">
+                	<p>避難所に喘息患者が来た場合、今回は飲水と咳の悪化時には再度連絡を、という対処を行ったが、それ以外にどのような対応ができるか<br>
+                		<textarea style="width: 100%; height: 10vh;">ここに記入</textarea>
+                		<!-- <input type="text" id="tag_name" name="tag_name"><br> -->
+                	<!-- <p>内容:<br><input type="text" id="contents" name="contents"><br><br> -->
+<!--                 	<input type="radio" name="choice" value="actionA">行動A
                 	<input type="radio" name="choice" value="actionB">行動B
                 	<br>
                 	<input type="radio" name="choice" value="actionC">行動C
                 	<input type="radio" name="choice" value="actionD">行動D
+                	<br> -->
+
+                	<input type="reset" id="ok_button_2" value="OK"></p>
+                	<!-- <input type="reset" id="ok_button" value="OK" ></p> -->
+	            </form>
+		    	<form id="tag_dialog_3" title="問題" style="display:none">
+                	<p>この一連の流れについて何が一番問題だと考えるか<br>
+                		<!-- <input type="text" id="tag_name" name="tag_name"><br> -->
+                	<!-- <p>内容:<br><input type="text" id="contents" name="contents"><br><br> -->
+                	<input type="radio" name="choice" value="actionA">本部、避難所、救護所間で情報の伝達がきちんとできていない
                 	<br>
-                	<input type="reset" id="ok_button" value="OK"></p>
+                	<input type="radio" name="choice" value="actionB">避難者が本部に直接対応を求めて来ている
+                	<br>
+                	<input type="radio" name="choice" value="actionC">救急車到着の誤報が流れている
+                	<br>
+                	<input type="radio" name="choice" value="actionD">本部が救護所や避難所の情報をちゃんと集めていない
+                	<br>
+                	<input type="reset" id="ok_button_3" value="OK"></p>
                 	<!-- <input type="reset" id="ok_button" value="OK" ></p> -->
 	            </form>
 		    </div>
 
 		    <div id="area_video_container">
-		    	<div class="video_container video_frame">
+		    	<div class="video_container video_frame" style="height: 80%;">
+                    本部
               		<video id="video1" class="video-js vjs-default-skin vjs-big-play-centered chvid" data-setup="{}" onclick="play_movie(this.id)">
-               			<source src="./resource/movie/setsunan/zensoku/hq/stream/zensoku_hq.m3u8" type="application/x-mpegURL">
+               			<source src="./resource/movie/setsunan/zensoku/hq/stream/zensoku_hq_low.m3u8" type="application/x-mpegURL">
                		</video>
 		   		</div>
 
-	    		<div class="video_container video_frame">
+	    		<div class="video_container video_frame" style="height: 80%;">
+                    救護所
              		<video id="video2" class="video-js vjs-default-skin vjs-big-play-centered chvid" data-setup="{}" onclick="play_movie(this.id)">
-                		<source src="./resource/movie/setsunan/zensoku/fa/stream/zensoku_fa.m3u8" type="application/x-mpegURL">
+                		<source src="./resource/movie/setsunan/zensoku/fa/stream/zensoku_fa_low.m3u8" type="application/x-mpegURL">
                 	</video>
 		    	</div>
 
@@ -81,7 +125,7 @@
 		   		</div> -->
 
 		    </div> <!-- アイテム -->
-		    <div id="talk_container"> <!-- アイテム -->
+		    <div id="talk_container">
 		    	<div class="infobox_container">
 		    		本部
 		    		<div class="infobox" id="hq_talk">
@@ -94,8 +138,13 @@
         			</div>
 		    	</div>
 		    	<div class="infobox_container">
-		    		避難所
-		    		<div class="infobox" id="shelter_talk">
+		    		使い方
+		    		<div class="infobox" id="shelter_talk" style="background-color: white;">
+                        <p>再生/停止ボタン : 動画の再生・停止を行う</p>
+                        <p>字幕切り替え : メイン画面の字幕を切り替える</p>
+                        <p>動画切り替え : メイン画面の動画を切り替える</p>
+                        <p>問題ボタン : それぞれ問題を出現させる。<br>※押さなくても特定の再生時間になると問題が出現する。</p>
+                        <p>画面下部の会話内容をクリックするとその場面に移動可能</p>
         			</div>
 		    	</div>
 		    </div>
