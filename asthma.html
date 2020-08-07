@@ -2,38 +2,34 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <!-- <link rel="stylesheet" type="text/css" href="resource/css/message_style.css">   -->
-    <!-- <link rel="stylesheet" type="text/css" href="resource/css/video_style.css"> -->
-<!--     <link rel="stylesheet" type="text/css" href="resource/css/message_style.css">  
-    <link rel="stylesheet" type="text/css" href="resource/css/video_style.css"> -->
     <link type="text/css" rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/cupertino/jquery-ui.min.css" />
     <link rel="stylesheet" type="text/css" href="resource/css/format.css">
     <link type="text/css" rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/cupertino/jquery-ui.min.css" />
 	</head>
 	<body>
-		<div id="container"> <!-- コンテナ -->
+		<div id="container"> <!-- ビデオコンテナ -->
 		    <div id="main_video_container">
-		    	<div class="main_video_frame" id="main_video_frame" style="display: none;">
+		    	<div class="main_video_frame" id="main_video_frame_1" style="display: block;">
               		<video id="video0" class="video-js vjs-default-skin vjs-big-play-centered chvid" data-setup="{}" >
-                		<source src="./resource/movie/setsunan/zensoku/hq/stream/zensoku_hq_low.m3u8" type="application/x-mpegURL">
-                	</video>
-		    	</div>
-
-		    	<div class="main_video_frame" id="main_video_frame_2" style="display: block;">
-              		<video id="video3" class="video-js vjs-default-skin vjs-big-play-centered chvid" data-setup="{}" >
                 		<source src="./resource/movie/setsunan/zensoku/fa/stream/zensoku_fa_low.m3u8" type="application/x-mpegURL">
                 	</video>
 		    	</div>
 
+		    	<div class="main_video_frame" id="main_video_frame_2" style="display: none;">
+              		<video id="video1" class="video-js vjs-default-skin vjs-big-play-centered chvid" data-setup="{}" >
+                		<source src="./resource/movie/setsunan/zensoku/hq/stream/zensoku_hq_low.m3u8" type="application/x-mpegURL">
+                	</video>
+		    	</div>
+
                 <div class="main_video_frame" id="main_video_frame_3" style="display: none;">
-                    <video id="video4" class="video-js vjs-default-skin vjs-big-play-centered chvid" data-setup="{}" >
-                        <source src="./resource/movie/setsunan/zensoku/hq/stream2/zensoku_hq.m3u8" type="application/x-mpegURL">
+                    <video id="video2" class="video-js vjs-default-skin vjs-big-play-centered chvid" data-setup="{}" >
+                        <source src="./resource/movie/setsunan/zensoku/fa/stream2/zensoku_fa.m3u8" type="application/x-mpegURL">
                     </video>
                 </div>
 
                 <div class="main_video_frame" id="main_video_frame_4" style="display: none;">
-                    <video id="video5" class="video-js vjs-default-skin vjs-big-play-centered chvid" data-setup="{}" >
-                        <source src="./resource/movie/setsunan/zensoku/fa/stream2/zensoku_fa.m3u8" type="application/x-mpegURL">
+                    <video id="video3" class="video-js vjs-default-skin vjs-big-play-centered chvid" data-setup="{}" >
+                        <source src="./resource/movie/setsunan/zensoku/hq/stream2/zensoku_hq.m3u8" type="application/x-mpegURL">
                     </video>
                 </div>
 
@@ -44,22 +40,14 @@
 		    		再生時間：<span id="value" >0:00:00</span>
 			    	<button class="panel" id="start" type="button" name="name" value="value" onclick="video_controll('play',false)">再生</button>
                     <button class="panel" id="stop" type="button" name="name" value="value" onclick="video_controll('pause',false)">停止</button>
-                    <button class="panel" id="change_word" type="button" name="name" value="value">字幕切り替え</button>
-                    <button class="panel" id="change_movie" type="button" name="name" value="value">動画切り替え</button>
-			    	<button class="panel" id="question_1" type="button" name="name" value="value">問題1</button>
-			    	<button class="panel" id="question_2" type="button" name="name" value="value">問題2</button>
-                    <button class="panel" id="question_3" type="button" name="name" value="value">問題3</button>
-<!-- 			    	<button class="panel" id="createTag" type="button" name="name" value="value">問題</button><br> -->
-<!-- 			    	<div class="infobox_switch" id="hq_talk_switch" style="display: none;">
-        			</div>
-        			<div class="infobox_switch" id="fa_talk_switch" style="display: block;">
-        			</div> -->
-        			<!-- <br><br><br><br> -->
+                    <button class="panel change_movie" id="subtitle">字幕切り替え</button>
+                    <button class="panel change_movie" id="change">動画切り替え</button>
+			    	<button class="panel question" id="question_1">問題1</button>
+			    	<button class="panel question" id="question_2">問題2</button>
+                    <button class="panel question" id="question_3">問題3</button>
         		</div>
 		    	<form id="tag_dialog_1" title="問題" style="display:none;">
                 	<p>なぜ咳のある喘息患者にここまで（救急車の検討　他）対応する必要があるか<br>
-                		<!-- <input type="text" id="tag_name" name="tag_name"><br> -->
-                	<!-- <p>内容:<br><input type="text" id="contents" name="contents"><br><br> -->
                 	<input type="radio" name="choice" value="actionA">感染症の疑いを捨てきれないから
                 	<br>
                 	<input type="radio" name="choice" value="actionB">喘息は急性に悪化し死ぬ場合があるから
@@ -68,28 +56,17 @@
                 	<br>
                 	<input type="radio" name="choice" value="actionD">本部に医者がおらず診断できないから
                 	<br>
-                	<input type="reset" id="ok_button_1" value="OK"></p>
+                	<input type="reset" class="ok_button" id="ok_button_1" value="OK"></p>
                 	<!-- <input type="reset" id="ok_button" value="OK" ></p> -->
 	            </form>
 		    	<form id="tag_dialog_2" title="問題" style="display:none">
                 	<p>避難所に喘息患者が来た場合、今回は飲水と咳の悪化時には再度連絡を、という対処を行ったが、それ以外にどのような対応ができるか<br>
                 		<textarea style="width: 100%; height: 10vh;">ここに記入</textarea>
-                		<!-- <input type="text" id="tag_name" name="tag_name"><br> -->
-                	<!-- <p>内容:<br><input type="text" id="contents" name="contents"><br><br> -->
-<!--                 	<input type="radio" name="choice" value="actionA">行動A
-                	<input type="radio" name="choice" value="actionB">行動B
-                	<br>
-                	<input type="radio" name="choice" value="actionC">行動C
-                	<input type="radio" name="choice" value="actionD">行動D
-                	<br> -->
-
-                	<input type="reset" id="ok_button_2" value="OK"></p>
+                	<input type="reset" class="ok_button" id="ok_button_2" value="OK"></p>
                 	<!-- <input type="reset" id="ok_button" value="OK" ></p> -->
 	            </form>
-		    	<form id="tag_dialog_3" title="問題" style="display:none">
+		    	<form id="tag_dialog_3"  title="問題" style="display:none">
                 	<p>この一連の流れについて何が一番問題だと考えるか<br>
-                		<!-- <input type="text" id="tag_name" name="tag_name"><br> -->
-                	<!-- <p>内容:<br><input type="text" id="contents" name="contents"><br><br> -->
                 	<input type="radio" name="choice" value="actionA">本部、避難所、救護所間で情報の伝達がきちんとできていない
                 	<br>
                 	<input type="radio" name="choice" value="actionB">避難者が本部に直接対応を求めて来ている
@@ -98,7 +75,7 @@
                 	<br>
                 	<input type="radio" name="choice" value="actionD">本部が救護所や避難所の情報をちゃんと集めていない
                 	<br>
-                	<input type="reset" id="ok_button_3" value="OK"></p>
+                	<input type="reset" class="ok_button" id="ok_button_3" value="OK"></p>
                 	<!-- <input type="reset" id="ok_button" value="OK" ></p> -->
 	            </form>
 		    </div>
@@ -106,25 +83,19 @@
 		    <div id="area_video_container">
 		    	<div class="video_container video_frame" style="height: 80%;">
                     本部
-              		<video id="video1" class="video-js vjs-default-skin vjs-big-play-centered chvid" data-setup="{}" onclick="play_movie(this.id)">
+              		<video id="video4" class="video-js vjs-default-skin vjs-big-play-centered chvid" data-setup="{}">
                			<source src="./resource/movie/setsunan/zensoku/hq/stream/zensoku_hq_low.m3u8" type="application/x-mpegURL">
                		</video>
 		   		</div>
 
 	    		<div class="video_container video_frame" style="height: 80%;">
                     救護所
-             		<video id="video2" class="video-js vjs-default-skin vjs-big-play-centered chvid" data-setup="{}" onclick="play_movie(this.id)">
+             		<video id="video5" class="video-js vjs-default-skin vjs-big-play-centered chvid" data-setup="{}">
                 		<source src="./resource/movie/setsunan/zensoku/fa/stream/zensoku_fa_low.m3u8" type="application/x-mpegURL">
                 	</video>
 		    	</div>
 
-<!-- 		    	<div class="video_container video_frame">
-              		<video id="video3" class="video-js vjs-default-skin vjs-big-play-centered chvid" data-setup="{}" onclick="play_movie(this.id)">
-                		<source src="./resource/movie/setsunan/zensoku/hq/stream/zensoku_hq.m3u8" type="application/x-mpegURL">
-                	</video>
-		   		</div> -->
-
-		    </div> <!-- アイテム -->
+		    </div> <!-- 会話ログ表示部分 -->
 		    <div id="talk_container">
 		    	<div class="infobox_container">
 		    		本部

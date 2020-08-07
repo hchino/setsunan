@@ -1,273 +1,206 @@
-var message_timer_fa=[];
-var message_timer_hq=[];
-var video = [];
+var message_timer_fa=[];	//faエリアのログ情報
+var message_timer_hq=[];	//hqエリアのログ情報
+var video = [];				//videojsの情報
+var video_frame = [];		//video入れてる枠(dev)の情報
 var log_file_fa = "resource/log_data/軽度喘息対応_救護所.csv";
 var log_file_hq = "resource/log_data/軽度喘息対応_本部.csv";
+//これやばい
 var question_flag_1 = true;
 var question_flag_2 = true;
 var question_flag_3 = true;
-var change_flag = true;
-var word_flag = true;
 
+var change_flag = true;		//時間経過による動画遷移フラグ
+var word_flag = true;		//字幕 on/off
+var camera_switch = true;	//2エリアカメラのスイッチ
+
+var area_name_1 = "fa";
+var area_name_2 = "hq";
 
 $(function() {
-
+	//csv読み込み
 	$.ajax({
 		beforeSend : function(xhr) {
 			xhr.overrideMimeType("text/plain; charset=shift_jis");
 		},
 		url: log_file_fa,
 		success: function(data) {
-			var talk_counter = 0;
-			var message_counter = 0;
-			var insert_contents = '';
 			var csvList = $.csv.toArrays(data);
-			for (var i = 1; i < csvList.length; i++) {
-				var hms = timer_count(csvList[i][0]);
-				if (csvList[i][0] != "") {
-					if (i != 1) {
-						insert_contents += "</span><div>--------------------------------------------</div></div>";
-					}
-					if (csvList[i][1] != "" && csvList[i][2] != "")	{
-						insert_contents += '<div id="message_fa_' + csvList[i][0] + '" onclick="' + 'video_controll(' + "'" + "log_change" +"'" + ',this.id)"><span>' + hms + "<br>" + csvList[i][1] + '「' + csvList[i][2] + "」";
-					} else if (csvList[i][2] != "") {
-						insert_contents += '<div id="message_fa_' + csvList[i][0] + '" onclick="' + 'video_controll(' + "'" + "log_change" +"'" + ',this.id)"><span>' + hms + "<br> ？「" + csvList[i][2] + "」";
-					} else {
-						insert_contents += '<div id="message_fa_' + csvList[i][0] + '" onclick="' + 'video_controll(' + "'" + "log_change" +"'" + ',this.id)"><span>' + hms + "〜 " + csvList[i][1] + " 〜";
-					}
-					message_timer_fa.push(csvList[i][0]);
-				} else {
-					if (csvList[i][1] != "" && csvList[i][2] != "")	{
-						insert_contents += "<div>" + csvList[i][1] + '「' + csvList[i][2] + "」</div>";
-					} else if (csvList[i][2] != "") {
-						insert_contents += "<div> ？「" + csvList[i][2] + "」</div>";
-					} else {
-						insert_contents += "<div>error</div>";
-					}
-				}
-			}
+			var insert_contents = csv_List(csvList,"fa");
 			$('#fa_talk').append(insert_contents);
-			$('#fa_talk_switch').append(insert_contents);
 		}
 	});
-
+	//csv読み込み
 	$.ajax({
 		beforeSend : function(xhr) {
 			xhr.overrideMimeType("text/plain; charset=shift_jis");
 		},
 		url: log_file_hq,
 		success: function(data) {
-			var talk_counter = 0;
-			var message_counter = 0;
-			var insert_contents = '';
 			var csvList = $.csv.toArrays(data);
-			for (var i = 1; i < csvList.length; i++) {
-				var hms = timer_count(csvList[i][0]);
-				if (csvList[i][0] != "") {
-					if (i != 1) {
-						insert_contents += "</span><div>--------------------------------------------</div></div>";
-					}
-					if (csvList[i][1] != "" && csvList[i][2] != "")	{
-						insert_contents += '<div id="message_hq_' + csvList[i][0] + '" onclick="' + 'video_controll(' + "'" + "log_change" +"'" + ',this.id)"><span>' + hms + "<br>" + csvList[i][1] + '「' + csvList[i][2] + "」";
-					} else if (csvList[i][2] != "") {
-						insert_contents += '<div id="message_hq_' + csvList[i][0] + '" onclick="' + 'video_controll(' + "'" + "log_change" +"'" + ',this.id)"><span>' + hms + "<br> ？「" + csvList[i][2] + "」";
-					} else {
-						insert_contents += '<div id="message_hq_' + csvList[i][0] + '" onclick="' + 'video_controll(' + "'" + "log_change" +"'" + ',this.id)"><span>' + hms + "〜 " + csvList[i][1] + " 〜";
-					}
-					message_timer_hq.push(csvList[i][0]);
-				} else {
-					if (csvList[i][1] != "" && csvList[i][2] != "")	{
-						insert_contents += "<div>" + csvList[i][1] + '「' + csvList[i][2] + "」</div>";
-					} else if (csvList[i][2] != "") {
-						insert_contents += "<div> ？「" + csvList[i][2] + "」</div>";
-					} else {
-						insert_contents += "<div>error</div>";
-					}
-				}
-			}
+			var insert_contents = csv_List(csvList,"hq");
 			$('#hq_talk').append(insert_contents);
-			$('#hq_talk_switch').append(insert_contents);
 		}
 	});
 
-//videoの数
+	//videojs情報の格納
 	for (var i = 0; i < 6; i++){
 		var video_id = "video" + i;
 		video[i] = videojs(video_id);
-		if (i != 3) {
+		if (i != 0) {
 			video[i].volume(0);
+		}
+		if (i < 4) {
+			var tmp_video = "main_video_frame_" + (i+1);
+			video_frame[i] = document.getElementById(tmp_video);
 		}
 	}
 
+	//再生バー
 	var range_element = document.getElementById("range");
-	range_element.addEventListener('input',rangeValue(range_element,(document.getElementById("value"))));
-
-	interval_set = setInterval(scroll, 500);
-	messageColor = setInterval(switch_messageColor, 100);
-	clearInterval(interval_set);
-	$("#createTag").on("click", function() {
-		var dialog = document.getElementById('tag_dialog');
-		$("#tag_dialog").dialog({ width: 1000, height: 1000 });
-	});
+	range_element.addEventListener('input',rangeValue(range_element,(document.getElementById("value"))));	//動かされたらrangeValueを発火
+	interval_set = setInterval(scroll, 500);	//定期実行関数
+	messageColor = setInterval(switch_messageColor, 500);	//定期実行関数
+	clearInterval(interval_set);	//一回切っておかないとなんかバグる(要検証)
 });
 
-function switch_video(status,word){	
-	var video_a = document.getElementById('main_video_frame');
-	var video_b = document.getElementById('main_video_frame_2');
-	var video_c = document.getElementById('main_video_frame_3');
-	var video_d = document.getElementById('main_video_frame_4');
-	if (status == "block" && word) {
-		video[0].volume(0);
-		video[3].volume(0);
-		video[4].volume(1);
-		video[5].volume(0);
-		video_a.style.display = "none";
-		video_b.style.display = "none";
-		video_c.style.display = "block";
-		video_d.style.display = "none";	
-	} else if (status == "none" && word) {
-		video[0].volume(0);
-		video[3].volume(0);
-		video[4].volume(0);
-		video[5].volume(1);
-		video_a.style.display = "none";
-		video_b.style.display = "none";
-		video_c.style.display = "none";
-		video_d.style.display = "block";
-	} else if (status == "block" && !word) {
-		video[0].volume(1);
-		video[3].volume(0);
-		video[4].volume(0);
-		video[5].volume(0);
-		video_a.style.display = "block";
-		video_b.style.display = "none";
-		video_c.style.display = "none";
-		video_d.style.display = "none";
-	} else if (status == "none" && !word && video_c.style.display == "block") {
-		video[0].volume(1);
-		video[3].volume(0);
-		video[4].volume(0);
-		video[5].volume(0);
-		video_a.style.display = "block";
-		video_b.style.display = "none";
-		video_c.style.display = "none";
-		video_d.style.display = "none";
-	} else if (status == "none" && !word) {
-		video[0].volume(0);
-		video[3].volume(1);
-		video[4].volume(0);
-		video[5].volume(0);
-		video_a.style.display = "none";
-		video_b.style.display = "block";
-		video_c.style.display = "none";
-		video_d.style.display = "none";
+//再生バー変更時に時間変更するやつ
+function rangeValue(elem, realtime) {
+	return function(evt){
+		var hms = timer_count(elem.value);	//現在の再生時間を変換(秒→時間:分:秒)
+		realtime.innerHTML = hms;			//反映
+		video_controll("pause", elem.value);	//操作中は動画停止する
 	}
 }
 
-function time_switch_video(status,word) {
-	var video_a = document.getElementById('main_video_frame');
-	var video_b = document.getElementById('main_video_frame_2');
-	var video_c = document.getElementById('main_video_frame_3');
-	var video_d = document.getElementById('main_video_frame_4');
-	if (status == "block" && word) {
-		video[0].volume(0);
-		video[3].volume(1);
-		video[4].volume(0);
-		video[5].volume(0);
-		video_a.style.display = "none";
-		video_b.style.display = "block";
-		video_c.style.display = "none";
-		video_d.style.display = "none";	
-	} else if (status == "none" && word) {
-		video[0].volume(1);
-		video[3].volume(0);
-		video[4].volume(0);
-		video[5].volume(0);
-		video_a.style.display = "block";
-		video_b.style.display = "none";
-		video_c.style.display = "none";
-		video_d.style.display = "none";
-	} else if (status == "block" && !word) {
-		video[0].volume(0);
-		video[3].volume(0);
-		video[4].volume(0);
-		video[5].volume(1);
-		video_a.style.display = "none";
-		video_b.style.display = "none";
-		video_c.style.display = "none";
-		video_d.style.display = "block";
-	} else if (status == "none" && !word) {
-		video[0].volume(0);
-		video[3].volume(0);
-		video[4].volume(1);
-		video[5].volume(0);
-		video_a.style.display = "none";
-		video_b.style.display = "none";
-		video_c.style.display = "block";
-		video_d.style.display = "none";
+//csv内容をコメントリストに
+function csv_List(csvList, area_name) {
+	var talk_counter = 0;		//会話数(ひと纏り)
+	var message_counter = 0;	//発話数(1発話、csvの行数と同じになるはず。空行がなければ)
+	var insert_contents = '';	//フロント(html)に表示する内容を格納
+	//csvの内容をフロントで表示できる形式に
+	for (var i = 1; i < csvList.length; i++) {	//1行目にはエリアが書いてあるので2行目から
+		var hms = timer_count(csvList[i][0]);	//時間形式変化(秒→時間:分:秒)
+		if (csvList[i][0] != "") {	//1列目が空白かどうか
+			if (i != 1) {			//一番最初はいらんやろっていう
+				insert_contents += "</span><div>--------------------------------------------</div></div>";
+			}
+
+			//共通内容、id,class,onclick関数
+			insert_contents += '<div id="message_' + area_name + '_' + csvList[i][0] + '" onclick="' + 'video_controll(' + "'" + "log_change" +"'" + ',this.id)"><span>' + hms;
+			
+			if (csvList[i][1] != "" && csvList[i][2] != "")	{	//2列(発話者),3列(発話内容)ともにある時
+				insert_contents += "<br>" + csvList[i][1] + '「' + csvList[i][2] + "」";
+			} else if (csvList[i][2] != "") {					//3列(発話内容)のみある時
+				insert_contents += "<br> ？「" + csvList[i][2] + "」";
+			} else {											//データ形式上ここに入ることはないはず
+				insert_contents += "〜 " + csvList[i][1] + " 〜";
+			}
+
+			//エリア識別
+			if (area_name == area_name_1) {
+				message_timer_fa.push(csvList[i][0]);
+			} else if (area_name == area_name_2) {
+				message_timer_hq.push(csvList[i][0]);
+			}
+
+		} else {
+			if (csvList[i][1] != "" && csvList[i][2] != "")	{	//2列(発話者),3列(発話内容)ともにある時
+				insert_contents += "<div>" + csvList[i][1] + '「' + csvList[i][2] + "」</div>";
+			} else if (csvList[i][2] != "") {					//3列(発話内容)のみある時
+				insert_contents += "<div> ？「" + csvList[i][2] + "」</div>";
+			} else {											//データ形式上ここに入ることはないはず
+				insert_contents += "<div>error</div>";
+			}
+		}
 	}
+	return insert_contents;
 }
 
+//問題作成ボタン
+$(".question").on("click", function() {
+	create_question(this.id);
+})
+
+//問題作成処理
 function create_question(question_number){
 	video_controll('pause',false);
-	var dialog_id = 'tag_dialog_' + question_number;
+	var dialog_id = 'tag_dialog_' + question_number.split('_')[1];
 	var dialog = document.getElementById(dialog_id);
-	$("#" + dialog_id).dialog({ width: 500, height: 300 });
+	$("#" + dialog_id).dialog({ width: 500, height: 300 });	//サイズ指定して開く
 }
 
-$("#ok_button_1").on("click", function() {
-	$("#tag_dialog_1").dialog("close");
-	video_controll('play',false);
-});
-$("#ok_button_2").on("click", function() {
-	$("#tag_dialog_2").dialog("close");
-	video_controll('play',false);
-});
-$("#ok_button_3").on("click", function() {
-	$("#tag_dialog_3").dialog("close");
-	video_controll('play',false);
+//問題閉じるボタン
+$(".ok_button").on("click", function() {
+	close_question(this.id);
 });
 
-$("#change_word").on("click", function() {
-	switch_video(document.getElementById('main_video_frame').style.display,word_flag);
-	if (word_flag) {
-		word_flag = false;
-	} else {
-		word_flag = true;
+//問題閉じる処理
+function close_question(question_num) {
+	var dialog = "#tag_dialog_" + question_num.split('_')[2];
+	$(dialog).dialog("close");
+	video_controll('play',false);
+}
+
+//メインビデオ変更ボタン押された時(字幕変更と動画変更)
+$(".change_movie").on("click", function() {
+	switch_video(camera_switch,word_flag,this.id);
+	if (this.id == "subtitle") {	//字幕変換後のフラグ管理
+		if (word_flag) {
+			word_flag = false;
+		} else {
+			word_flag = true;
+		}
+	} else if (this.id == "change") {	//動画変換後のフラグ管理
+		if (camera_switch) {
+			camera_switch = false;
+		} else {
+			camera_switch = true;
+		}
 	}
 });
 
+//メインビデオの変更
+function switch_video(status,word,button){	
+	//camera_numberは
+	// 0 : エリア1字幕あり
+	// 1 : エリア2字幕あり
+	// 2 : エリア1字幕なし
+	// 3 : エリア2字幕なし
+	if (status){
+		var camera_number = 0;
+	} else {
+		var camera_number = 1;
+	}
+	switch(button) {
+		case 'subtitle':
+			if (word){
+				camera_number += 2;
+			}
+			break;
+		case 'change':
+			if (status){
+				camera_number += 1;
+			} else {
+				camera_number -= 1;
+			}
+			if (!word){
+				camera_number += 2;
+			}
+			break;
+	}
+	//選択されたcamera_numberのカメラだけ表示する
+	for (var i = 0; i < 4; i++) {
+		if (i == camera_number) {
+			video[i].volume(1);
+			video_frame[i].style.display = "block";
+		} else {
+			video[i].volume(0);
+			video_frame[i].style.display = "none";
+		}
+	}
+}
 
-$("#change_movie").on("click", function() {
-	time_switch_video((document.getElementById('main_video_frame')).style.display, word_flag);
-});
-
-// $("#start").on("click", function() {
-// 	var a = document.getElementById('main_video_frame');
-// 	var b = document.getElementById('main_video_frame_2');
-// 	a.style.display = "none";
-// 	b.style.display = "block";
-// });
-
-// $("#stop").on("click", function() {
-// 	var a = document.getElementById('main_video_frame');
-// 	var b = document.getElementById('main_video_frame_2');
-// 	a.style.display = "block";
-// 	b.style.display = "none";
-// });
-
-$("#question_1").on("click", function() {
-	create_question("1");
-});
-
-$("#question_2").on("click", function() {
-	create_question("2");
-});
-
-$("#question_3").on("click", function() {
-	create_question("3");
-});
-
+//時間合わせ
 function timer_count(now_time) {
   var hh = parseInt(now_time / 3600); 
   var mm = ( '00' + parseInt((now_time - (hh*3600))/60)).slice(-2);
@@ -276,6 +209,7 @@ function timer_count(now_time) {
   return timer;
 }
 
+//ビデオの処理(再生停止とか)
 function video_controll(command, now) {
 	Interval_change("clear");
 	if (command == 'log_change') {
@@ -312,11 +246,30 @@ function video_controll(command, now) {
 	if (command == 'log_change' || command == 'pause') {
 		Interval_change("clear");
 	} else {
-		console.log("aaaaaa");
 		Interval_change("start");
 	}
 }
 
+//サブビデオをメインに
+// function play_movie(id) {
+//   current = video[0].currentTime();
+//   if (id.match(/html5_api/)){
+//   } else {
+//   	video_id = id.replace(/video/g, '');
+//     video[0].src(video[video_id].src());
+//     for (var i = 0;i < video.length; i++) {
+//       video[i].currentTime(current);
+//       video[i].pause();
+//     }
+//     setTimeout(() => {
+//       video[0].currentTime(current);
+//       video[0].pause();
+//     }, 100);
+//     Interval_change("clear");
+//   }
+// }
+
+//定期実行関数のオンオフ
 function Interval_change (state) {
 	switch (state) {
 		case 'start':
@@ -328,45 +281,30 @@ function Interval_change (state) {
 	}
 }
 
+//会話リストの背景変更(定期実行)
 var switch_messageColor = function(){
+	change_message_color(message_timer_fa, "fa");
+	change_message_color(message_timer_hq, "hq");
+}
+
+//会話リストの背景変更実行部分
+function change_message_color(time_data, area) {
 	var now = video[0].currentTime();
-	for (var i = 0;i<message_timer_fa.length; i++){
-    	var href = "message_fa_" + message_timer_fa[i];
-    	var element = document.getElementById(href);
-
-    	if (message_timer_fa[i] < now && message_timer_fa[i+1] > now){
-    		element.style.backgroundColor = '#CCCCCC';
-    		// console.log(element);
-    		// for (j=0; j<element.length; j++){
-    		// 	element[j].style.backgroundColor = '#CCCCCC';
-    		// }
-    	}
-    	else {
-   //  		for (j=0; j<element.length; j++){
-   //  			element[j].style.backgroundColor = '#fff0f0';
-			// }
-			element.style.backgroundColor = '#fff0f0';
-    	}
-  	}
-
-	for (var i = 0;i<message_timer_hq.length; i++){
-    	var href = "message_hq_" + message_timer_hq[i];
-    	var element = document.getElementById(href);
-    	if (message_timer_hq[i] < now && message_timer_hq[i+1] > now){
-    		// for (j=0; j<element.length; j++){
-    		// 	element[j].style.backgroundColor = '#CCCCCC';
-    		// }
-    		element.style.backgroundColor = '#CCCCCC';
-    	}
-    	else {
-   //  		for (j=0; j<element.length; j++){
-   //  			element[j].style.backgroundColor = '#fff0f0';
-			// }
-			element.style.backgroundColor = '#fff0f0';
-    	}
+	for (var i = 0; i < time_data.length; i++) {
+		var href = "message_" + area + "_" + time_data[i];
+		var element = document.getElementById(href);
+    	if (now != 0){
+	    	if (time_data[i] <= now && time_data[i+1] > now){
+	    		element.style.backgroundColor = '#CCCCCC';
+	    	}
+	    	else {
+				element.style.backgroundColor = '#fff0f0';
+	    	}
+	    }
   	}
 }
 
+//会話リストの自動スクロール(定期実行)
 function scroll() {
 	var timer = parseInt((video[0]).currentTime());
 	var speed = 400;
@@ -376,24 +314,24 @@ function scroll() {
 	document.getElementById("value").innerText = hms;
 	document.getElementById("range").value = timer;
 	if (timer == 140 && change_flag) {
-		// console.log((document.getElementById('main_video_frame')).style.display);
-		time_switch_video((document.getElementById('main_video_frame')).style.display, word_flag);
+		// time_switch_video((document.getElementById('main_video_frame')).style.display, word_flag);
+		switch_video(camera_switch,word_flag,"change");
 		change_flag = false;
 	}
 	if (timer == 196 && question_flag_1) {
-		create_question('1');
+		create_question('question_1');
 		question_flag_1 = false;
 	} else if (timer != 196) {
 		question_flag_1 = true;
 	}
 	if (timer == 285 && question_flag_2) {
-		create_question('2');
+		create_question('question_2');
 		question_flag_2 = false;
 	} else if (timer != 285) {
 		question_flag_2 = true;
 	}
 	if (timer == 459 && question_flag_3) {
-		create_question('3');
+		create_question('question_3');
 		question_flag_3 = false;
 	} else if (timer != 459) {
 		question_flag_3 = true;
@@ -414,70 +352,11 @@ function scroll() {
 			break;
 		}
 	}
-
 	if (timer > 1) {
-		//console.log(timer);
-		//$('#fa_talk').animate({scrollTop:$("#fa_talk>." + message_id_fa).position().top + $('#fa_talk').scrollTop()}, speed, 'swing');
-		//$('#hq_talk').animate({scrollTop:$("#hq_talk>." + message_id_hq).position().top + $('#hq_talk').scrollTop()}, speed, 'swing');
-		//$('#fa_talk').animate({scrollTop:$("#" + message_id_fa).position().top + $('#fa_talk').scrollTop()}, speed, 'swing');
-		//$('#infobox').animate({scrollTop:$("#" + message_id).position().top + $('#infobox').scrollTop() - 22 - 300}, speed, 'swing');
+		// $('#fa_talk').animate({scrollTop:$("#" + message_id_fa).position().top + $('#fa_talk').scrollTop()}, speed, 'swing');
+		// $('#hq_talk').animate({scrollTop:$("#" + message_id_hq).position().top + $('#hq_talk').scrollTop()}, speed, 'swing');
+		// $('#infobox').animate({scrollTop:$("#" + message_id).position().top + $('#infobox').scrollTop() - 22 - 300}, speed, 'swing');
 	} else {
 		return false;
 	}
-}
-
-function play_movie(id) {
-  current = video[0].currentTime();
-  if (id.match(/html5_api/)){
-    //console.log("特に何もないよ！！");
-  } else {
-  	video_id = id.replace(/video/g, '');
-    video[0].src(video[video_id].src());
-    for (var i = 0;i < video.length; i++) {
-      video[i].currentTime(current);
-      video[i].pause();
-    }
-    // clear_Interval();
-    setTimeout(() => {
-      video[0].currentTime(current);
-      video[0].pause();
-    }, 100);
-    Interval_change("clear");
-  }
-}
-
-function rangeValue(elem, realtime) {
-	return function(evt){
-		var hms = timer_count(elem.value);
-		realtime.innerHTML = hms;
-		video_controll("pause", elem.value);
-	}
-}
-
-function checkcolor(color) {
-  switch (color) {
-    case '赤エリア':
-      var color = 'red';
-      break;
-    case '黄エリア':
-      var color = '#FFCC00';
-      //var color = document.getElementById("camera_1").style.color 
-      break;
-    case '緑エリア':
-      var color = 'green';
-      break;
-    //case 'トリアージ本部':
-    case '現地統括本部':
-      var color = '#00CC00';
-      //var color = document.getElementById("camera_4").style.color 
-      break;
-    case '災害対策本部':
-      var color = 'blue'
-      break;
-    case '1次トリアージエリア':
-      var color = '#ffa07a'
-      //var color = document.getElementById("camera_3").style.color 
-      break;
-  }
-  return color;
 }
