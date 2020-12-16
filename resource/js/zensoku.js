@@ -2,10 +2,9 @@ var message_timer_fa=[];	//faエリアのログ情報
 var message_timer_hq=[];	//hqエリアのログ情報
 var video = [];				//videojsの情報
 var video_frame = [];		//video入れてる枠(dev)の情報
-var log_file_fa = "resource/log_data/軽度喘息対応_救護所.csv";	//faエリアのcsvファイルパス
-var log_file_hq = "resource/log_data/軽度喘息対応_本部.csv";	//hqエリアのcsvファイルパス
-
-//これやばい。質問1,2,3それぞれの出題状況をフラグ管理する変数
+var log_file_fa = "resource/log_data/軽度喘息対応_救護所.csv";
+var log_file_hq = "resource/log_data/軽度喘息対応_本部.csv";
+//これやばい
 var question_flag_1 = true;
 var question_flag_2 = true;
 var question_flag_3 = true;
@@ -14,59 +13,57 @@ var change_flag = true;		//時間経過による動画遷移フラグ
 var word_flag = true;		//字幕 on/off
 var camera_switch = true;	//2エリアカメラのスイッチ
 
-//気休めの変数。将来的にはここのエリア名(faとかhq)を変えるとビデオや字幕がそれぞれのエリアに適したものになるようにしたい
-//現在は変数を決めてるだけでここを変えてもビデオや字幕は変わらない。
 var area_name_1 = "fa";
 var area_name_2 = "hq";
 
 $(function() {
 	//csv読み込み
-	$.ajax({	//ajax(Asynchronous Javascript and XML)通信。非同期通信ともいう。分からないなら調べるか聞いてくれ
-		beforeSend : function(xhr) {	//csvを読み込む前の処理。読み込むcsvファイルの文字コードとかを指定
-			xhr.overrideMimeType("text/plain; charset=shift_jis");
-		},
-		url: log_file_fa	//csvファイルのパス
-	}).done(function(data) {	//.done()で通信成功時の処理。今回は指定したパスにきちんとcsvファイルがあれば実行される。
-		var csvList = $.csv.toArrays(data);				//csvファイルの内容を丸々csvListという変数(配列)に格納
-		var insert_contents = csv_List(csvList,"fa");	//csv_Listという関数の呼び出し。csv_Listは79行目
-		$('#fa_talk').append(insert_contents);			//htmlファイル(asthma.html)のid="fa_talk"要素(asthma.htmlの108行目)にinsert_contents変数の内容を追加する
-	});
-	//ちなみに失敗時の処理は.fail()で、成功だろうが失敗だろうが実行する場合は.always()
-
-	//csv読み込み。やってることは上のやつと一緒
 	$.ajax({
 		beforeSend : function(xhr) {
 			xhr.overrideMimeType("text/plain; charset=shift_jis");
 		},
-		url: log_file_hq
-	}).done(function(data) {
-		var csvList = $.csv.toArrays(data);
-		var insert_contents = csv_List(csvList,"hq");
-		$('#hq_talk').append(insert_contents);
+		url: log_file_fa,
+		success: function(data) {
+			var csvList = $.csv.toArrays(data);
+			var insert_contents = csv_List(csvList,"fa");
+			$('#fa_talk').append(insert_contents);
+		}
+	});
+	//csv読み込み
+	$.ajax({
+		beforeSend : function(xhr) {
+			xhr.overrideMimeType("text/plain; charset=shift_jis");
+		},
+		url: log_file_hq,
+		success: function(data) {
+			var csvList = $.csv.toArrays(data);
+			var insert_contents = csv_List(csvList,"hq");
+			$('#hq_talk').append(insert_contents);
+		}
 	});
 
 	//videojs情報の格納
-	for (var i = 0; i < 6; i++){	//asthma.html内のidがvideo＋数字のものをカウント。今回は数字で6って打ってるけどビデオの数でここの数字は変わる
-		var video_id = "video" + i;	//ここでid要素を指定
-		video[i] = videojs(video_id);	//video[]にそれぞれのビデオ情報を格納
-		if (i != 0) {					//idがvideo0以外のものは音量をオフ
+	for (var i = 0; i < 6; i++){
+		var video_id = "video" + i;
+		video[i] = videojs(video_id);
+		if (i != 0) {
 			video[i].volume(0);
 		}
-		if (i < 4) {	//サブビデオ(画面右側の2個)の情報だけ別で格納
+		if (i < 4) {
 			var tmp_video = "main_video_frame_" + (i+1);
 			video_frame[i] = document.getElementById(tmp_video);
 		}
 	}
 
 	//再生バー
-	var range_element = document.getElementById("range");	//再生バーの情報をrange_elementに
-	range_element.addEventListener('input',rangeValue(range_element,(document.getElementById("value"))));	//動かされたらrangeValue関数を発火。rangeValueは70行目
-	interval_set = setInterval(scroll, 500);	//定期実行関数。scrollという関数を500msごとに実行する。268行目
-	messageColor = setInterval(switch_messageColor, 500);	//定期実行関数。switch_messageColorという関数を500msごとに実行する。291行目
-	clearInterval(interval_set);	//intervalset変数(64行目)で定期実行しているものを停止させる。なんか一回切っておかないとバグる(要検証)
+	var range_element = document.getElementById("range");
+	range_element.addEventListener('input',rangeValue(range_element,(document.getElementById("value"))));	//動かされたらrangeValueを発火
+	interval_set = setInterval(scroll, 500);	//定期実行関数
+	messageColor = setInterval(switch_messageColor, 500);	//定期実行関数
+	clearInterval(interval_set);	//一回切っておかないとなんかバグる(要検証)
 });
 
-//再生バー変更時に時間変更する
+//再生バー変更時に時間変更するやつ
 function rangeValue(elem, realtime) {
 	return function(evt){
 		var hms = timer_count(elem.value);	//現在の再生時間を変換(秒→時間:分:秒)
@@ -75,7 +72,7 @@ function rangeValue(elem, realtime) {
 	}
 }
 
-//csv内容をコメントリストに。csvのフォーマットは1列目が時間,2列目が発話者,3列目が内容,となっているのでその形式に合わせて処理する。
+//csv内容をコメントリストに
 function csv_List(csvList, area_name) {
 	var talk_counter = 0;		//会話数(ひと纏り)
 	var message_counter = 0;	//発話数(1発話、csvの行数と同じになるはず。空行がなければ)
@@ -116,20 +113,20 @@ function csv_List(csvList, area_name) {
 			}
 		}
 	}
-	return insert_contents;	//insert_contentsを返す。31行目 and 44行目
+	return insert_contents;
 }
 
-//問題作成ボタン。html側でclass="question"の要素をクリックした時に発火する関数
+//問題作成ボタン
 $(".question").on("click", function() {
-	create_question(this.id);	//クリックされた要素が持つidをcreate_question関数へ。128行目
+	create_question(this.id);
 })
 
 //問題作成処理
 function create_question(question_number){
-	video_controll('pause',false);	//再生中のビデオを止める。video_controll関数は216行目
-	var dialog_id = 'tag_dialog_' + question_number.split('_')[1];	//問題番号。喘息は1-3のどれか
-	var dialog = document.getElementById(dialog_id);	//問題番号のダイアログ情報を格納
-	$("#" + dialog_id).dialog({ width: 500, height: 300 });	//サイズ指定してダイアログを開く
+	video_controll('pause',false);
+	var dialog_id = 'tag_dialog_' + question_number.split('_')[1];
+	var dialog = document.getElementById(dialog_id);
+	$("#" + dialog_id).dialog({ width: 500, height: 300 });	//サイズ指定して開く
 }
 
 //問題閉じるボタン
@@ -146,7 +143,7 @@ function close_question(question_num) {
 
 //メインビデオ変更ボタン押された時(字幕変更と動画変更)
 $(".change_movie").on("click", function() {
-	switch_video(camera_switch,word_flag,this.id);	//実際にビデオを変更するのはswitch_video関数(166行目)。
+	switch_video(camera_switch,word_flag,this.id);
 	if (this.id == "subtitle") {	//字幕変換後のフラグ管理
 		if (word_flag) {
 			word_flag = false;
@@ -169,14 +166,14 @@ function switch_video(status,word,button){
 	// 1 : エリア2字幕あり
 	// 2 : エリア1字幕なし
 	// 3 : エリア2字幕なし
-	if (status){	//statusは現在どちらのエリアがメインかを格納している
+	if (status){
 		var camera_number = 0;
 	} else {
 		var camera_number = 1;
 	}
-	switch(button) {	//buttonは押されたボタンがどちらか(字幕変換[subtitle]or動画変換[change])
+	switch(button) {
 		case 'subtitle':
-			if (word){	//wordは現在の字幕のon/offを格納してる
+			if (word){
 				camera_number += 2;
 			}
 			break;
@@ -191,7 +188,7 @@ function switch_video(status,word,button){
 			}
 			break;
 	}
-	//選択されたcamera_numberのカメラだけ表示して他を非表示&音量0に
+	//選択されたcamera_numberのカメラだけ表示する
 	for (var i = 0; i < 4; i++) {
 		if (i == camera_number) {
 			video[i].volume(1);
@@ -203,7 +200,7 @@ function switch_video(status,word,button){
 	}
 }
 
-//時間合わせ。秒から 時間:分:秒 への変換
+//時間合わせ
 function timer_count(now_time) {
   var hh = parseInt(now_time / 3600); 
   var mm = ( '00' + parseInt((now_time - (hh*3600))/60)).slice(-2);
@@ -213,10 +210,10 @@ function timer_count(now_time) {
 }
 
 //ビデオの処理(再生停止とか)
-function video_controll(command, now) {	//commandはplay(動画再生),pause(動画停止),log_change(字幕からの動画時間変更)のどれかが格納されていて、nowは現在の再生時間もしくは字幕のid
-	Interval_change("clear");	//ビデオ変更時の読み込みと関数の定期実行が重なると挙動がおかしくなるので一度定期実行を切る
-	if (command == 'log_change') {	//commandがlog_changeの場合。つまり字幕リストをクリックされた時の処理。字幕リストの場合nowにはidがあるのでこれを再生時間に変換する
-		if (now.match(/hq/)) {		
+function video_controll(command, now) {
+	Interval_change("clear");
+	if (command == 'log_change') {
+		if (now.match(/hq/)) {
 			now = now.replace(/message_hq_/g,'');
 		}
 		if (now.match(/fa/)) {
@@ -225,15 +222,16 @@ function video_controll(command, now) {	//commandはplay(動画再生),pause(動
 		var elem = document.getElementById("range");
 		var hms = timer_count(now);
 		var value = document.getElementById("value");
-		value.innerHTML = hms;	//valueにhmsの時刻を格納
+		value.innerHTML = hms;
 	}
-	if (now == false) {	//停止ボタンが押された際は現在の再生時間をnowへ格納
+	if (now == false) {
 		now = document.getElementById("range").value;
 	} else {
 		document.getElementById("range").value = now;
 	}
-	for (var i=0; i<video.length; i++) {	//実際にビデオを操作する部分。停止なら全ビデオの停止、再生なら時刻nowで全ビデオを再生
-		video[i].currentTime(now);
+	for (var i=0; i<video.length; i++) {
+		video[i].currentTime(now)
+		;
 		switch (command) {
 			case 'play':
 				video[i].playbackRate(1.0);
@@ -245,14 +243,33 @@ function video_controll(command, now) {	//commandはplay(動画再生),pause(動
 				break;
 		}
 	}
-	if (command == 'log_change' || command == 'pause') {	//停止操作の場合は定期実行を止める
+	if (command == 'log_change' || command == 'pause') {
 		Interval_change("clear");
-	} else {	//停止以外なら、止めていた定期実行関数を再開
+	} else {
 		Interval_change("start");
 	}
 }
 
-//定期実行関数のオンオフ。
+//サブビデオをメインに
+// function play_movie(id) {
+//   current = video[0].currentTime();
+//   if (id.match(/html5_api/)){
+//   } else {
+//   	video_id = id.replace(/video/g, '');
+//     video[0].src(video[video_id].src());
+//     for (var i = 0;i < video.length; i++) {
+//       video[i].currentTime(current);
+//       video[i].pause();
+//     }
+//     setTimeout(() => {
+//       video[0].currentTime(current);
+//       video[0].pause();
+//     }, 100);
+//     Interval_change("clear");
+//   }
+// }
+
+//定期実行関数のオンオフ
 function Interval_change (state) {
 	switch (state) {
 		case 'start':
@@ -264,20 +281,20 @@ function Interval_change (state) {
 	}
 }
 
-//会話リストの背景変更(定期実行)。現在話されている内容を色付け
+//会話リストの背景変更(定期実行)
 var switch_messageColor = function(){
 	change_message_color(message_timer_fa, "fa");
 	change_message_color(message_timer_hq, "hq");
 }
 
 //会話リストの背景変更実行部分
-function change_message_color(time_data, area) {	//time_dataには各エリアの会話時刻がリストで格納されてる
+function change_message_color(time_data, area) {
 	var now = video[0].currentTime();
-	for (var i = 0; i < time_data.length; i++) {	//会話時刻のリストと再生時間を比べて一番近い部分の会話を見つける
+	for (var i = 0; i < time_data.length; i++) {
 		var href = "message_" + area + "_" + time_data[i];
 		var element = document.getElementById(href);
     	if (now != 0){
-	    	if (time_data[i] <= now && time_data[i+1] > now){	//該当部分の色付け
+	    	if (time_data[i] <= now && time_data[i+1] > now){
 	    		element.style.backgroundColor = '#CCCCCC';
 	    	}
 	    	else {
@@ -289,20 +306,20 @@ function change_message_color(time_data, area) {	//time_dataには各エリア�
 
 //会話リストの自動スクロール(定期実行)
 function scroll() {
-	var timer = parseInt((video[0]).currentTime());	//現在の再生時間
-	var speed = 400;	//自動スクロール速度
+	var timer = parseInt((video[0]).currentTime());
+	var speed = 400;
 	var message_id_hq = "message_hq_" + timer;
 	var message_id_fa = "message_fa_" + timer;
-	var hms = timer_count(timer);	//時刻変換
+	var hms = timer_count(timer);
 	document.getElementById("value").innerText = hms;
 	document.getElementById("range").value = timer;
-	//以下再生時間(timer)が特定の時間の場合に発火する処理。
 	if (timer == 140 && change_flag) {
-		switch_video(camera_switch,word_flag,"change");	//画面の自動切り替え
+		// time_switch_video((document.getElementById('main_video_frame')).style.display, word_flag);
+		switch_video(camera_switch,word_flag,"change");
 		change_flag = false;
 	}
 	if (timer == 196 && question_flag_1) {
-		create_question('question_1');	//問題1の表示
+		create_question('question_1');
 		question_flag_1 = false;
 	} else if (timer != 196) {
 		question_flag_1 = true;
@@ -320,16 +337,13 @@ function scroll() {
 		question_flag_3 = true;
 	}
 
-	//現在時刻と会話リストの時刻を比べて現在の時刻に行われている会話を見つける
 	while (!(document.getElementsByClassName(message_id_hq))) {
 		timer = timer - 1;
-		message_id_hq = "message_hq_" + timer;	//見つけた会話を保持
+		message_id_hq = "message_hq_" + timer;
 		if (timer < 1) {
 			break;
 		}
 	}
-
-	//もう一回同じことする。2エリア分するので
 	timer = parseInt((video[0]).currentTime());
 	while (!(document.getElementsByClassName(message_id_fa))) {
 		timer = timer - 1;
@@ -338,16 +352,64 @@ function scroll() {
 			break;
 		}
 	}
-
-	//見つけた会話の部分まで会話リストを自動スクロールする
 	if (timer > 1) {
-                var fa = document.getElementById("fa_talk");
-                var fa_message = document.getElementById(message_id_fa);
-                var hq = document.getElementById("hq_talk");
-                var hq_message = document.getElementById(message_id_hq);
-                $('#fa_talk').animate({scrollTop:($("#" + message_id_fa).position()).top - (fa.getBoundingClientRect().height)/2 + (fa_message.getBoundingClientRect().height)/2 + $('#fa_talk').scrollTop()}, speed, 'swing');
-                $('#hq_talk').animate({scrollTop:($("#" + message_id_hq).position()).top - (hq.getBoundingClientRect().height)/2 + (hq_message.getBoundingClientRect().height)/2 + $('#hq_talk').scrollTop()}, speed, 'swing');
+		// $('#fa_talk').animate({scrollTop:$("#" + message_id_fa).position().top + $('#fa_talk').scrollTop()}, speed, 'swing');
+		// $('#hq_talk').animate({scrollTop:$("#" + message_id_hq).position().top + $('#hq_talk').scrollTop()}, speed, 'swing');
+		// $('#infobox').animate({scrollTop:$("#" + message_id).position().top + $('#infobox').scrollTop() - 22 - 300}, speed, 'swing');
 	} else {
 		return false;
 	}
+}
+
+//id="ok"を押された時の処理。最初の基本情報入力欄のokボタンのこと
+$("#ok").on("click", function() {
+	user_name = document.getElementById("user_name").value;		//名前入力欄の情報を格納
+	user_number = document.getElementById("user_number").value;	//学籍番号欄の情報を格納
+	//以下エラー処理。未入力の場合にエラー分を表示
+	if (user_name == '') {
+        (document.getElementById("name_error")).style.display = "block";	//エラー分を表示
+        return
+    }
+    if (user_number == '') {
+        (document.getElementById("name_error")).style.display = "none";
+        (document.getElementById("number_error")).style.display = "block";
+        return
+    }
+
+    var now = new Date();	//現在時刻の格納
+    //clockに 年/月/日 時：分：秒：ミリ秒 の形式に変換
+    var clock = now.getFullYear() + "/" + (now.getMonth()+1) + "/" + now.getDate() + " " + ('00' + now.getHours()).slice(-2) + ":" + ('00' + now.getMinutes()).slice(-2) + ":" + ('00' + now.getSeconds()).slice(-2) + "." + ('000' + now.getMilliseconds()).slice(-3);
+
+    var parameter = "name:" + user_name + "\t" + "number:" + user_number + "\n" + clock;	//名前 学籍番号 現在時刻 の形式でサーバに送信
+
+    createLog(parameter);	//サーバ側でログを作成
+	$('.data_modal').fadeOut();	//基本情報入力欄を閉じる
+});
+
+//サーバ側にデータ保存。今回はDBは使っておらずテキスト記録のみ
+function createLog(input_parameter) {
+	var send_user_name = encodeURIComponent(user_name);			//名前を送信形式に
+	var send_user_number = encodeURIComponent(user_number);		//学籍番号を送信形式に
+	var send_parameter = encodeURIComponent(input_parameter);	//パラメータを送信形式に
+	var httpobj = createHttpRequest();							//リクエストの作成
+    httpobj.open("POST","resource/php/upload.php");				//phpに対してPOST
+    httpobj.setRequestHeader('Content-Type','application/x-www-form-urlencoded; charset=UTF-8');	//データ形式や文字コードの指定
+    httpobj.send("user_name=" + send_user_name + "&class_name=" + send_user_number + "&parameter=" + send_parameter);	//送信データの格納
+}
+
+//リクエスト作成関数
+function createHttpRequest(){
+  try{
+      return new XMLHttpRequest();
+    }catch(e){}
+    try{
+      return new ActiveXObject('MSXML2.XMLHTTP.6.0');
+    }catch(e){}
+    try{
+      return new ActiveXObject('MSXML2.XMLHTTP.3.0');
+    }catch(e){}
+    try{
+      return new ActiveXObject('MSXML2.XMLHTTP');
+    }catch(e){}
+    return null;
 }
